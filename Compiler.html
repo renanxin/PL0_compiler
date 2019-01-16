@@ -1,0 +1,270 @@
+<link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css">
+<link href="codemirror/theme/mdn-like.css" rel="stylesheet" type="text/css">
+<link href="codemirror/addon/display/fullscreen.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="codemirror/lib/codemirror.js"></script>
+
+<script type="text/javascript" src="codemirror/mode/javascript/javascript.js"></script>
+<script type="text/javascript" src="codemirror/addon/display/placeholder.js"></script>
+<script type="text/javascript" src="codemirror/mode/xml/xml.js"></script>
+<script type="text/javascript" src="codemirror/mode/css/css.js"></script>
+<script type="text/javascript" src="codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<script type="text/javascript" src="codemirror/addon/selection/active-line.js"></script>
+<script type="text/javascript" src="codemirror/addon/edit/matchbrackets.js"></script>
+<script type="text/javascript" src="codemirror/addon/display/fullscreen.js"></script>
+
+<script type="text/javascript" src="/eel.js"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PL0编译器</title>
+</head>
+<body background="timg.jpeg">
+
+
+        <div id="container" >
+            <section  id="main_content" style="margin: 0 auto;">
+                <div class="" id="head">
+                    <h1 style="text-align:center;font-weight:bold;font-style:italic;color: rgba(255,255,255,0.49);font-size: 40px;">PL0 Compiler</h1>
+                </div>
+                <div style="height: 10%;"></div>
+                <div  style="width: 950px; position:relative; margin: 0 auto;">
+                    <div style="width: 400px; float: left" align="left" >
+                        <textarea id="code" placeholder="Input code there." name="code" style="resize:none" rows="10" cols="50"></textarea>
+                        <div style="height: 10px"></div>
+                        <div id="layout_file" style="float:left" align="left">
+                            <input id="input-file" type="file" onchange="showFileName()" style="color: rgba(255,255,255,0.49);font-size: 18px;">
+                        </div>
+                        <div style="height: 10px; width: 400px; float: left" align="left"></div>
+                        <div id="layout_confirm" style="width: 400px; float: left" align="left">
+                            <button type="submit" class="btn btn-secondary" onclick="compile()"  style="background: #47ecff;width: 80px;border-radius:8px">Compile</button>
+                            <button type="submit" class="btn btn-secondary" onclick="run()"  style="background: #87ff82;width: 80px;border-radius:8px">Run</button>
+                        </div>
+                    </div>
+
+                    <div  style="width: 400px; float: right" >
+                        <textarea id="result" placeholder="The result of your code." name="code" style="resize:none" rows="10" cols="50"></textarea>
+                        <div style="height: 10px"></div>
+                        <div>
+                            <label style="font-weight: bold">状态：</label>
+                            <label id="label_result" style="font-weight: bold">未编译</label>
+                        </div>
+                        <div style="height: 10px"></div>
+                        <div>
+                            <button id="error_log" class="btn btn-secondary" onclick="show_error()"  style="background: #ffc725;width: 90px;border-radius:8px;font-weight: bold">查看错误信息</button>
+                            <button id="symbol_table" class="btn btn-secondary" onclick="show_symboltable()"  style="background: #ffc725;width: 90px;border-radius:8px;font-weight: bold">查看符号表</button>
+                            <button id="P-code" class="btn btn-secondary" onclick="show_code()"  style="background: #ffc725;width: 90px;border-radius:8px;font-weight: bold">查看P-code</button>
+                            <button id="run_result" class="btn btn-secondary" onclick="show_result()"  style="background: #ffc725;width: 90px;border-radius:8px;font-weight: bold">运行结果</button>
+                        </div>
+                    </div>
+			    </div>
+
+            </section>
+        </div>
+
+
+        <script type="text/javascript">
+            // var a = window.prompt("请输入：");
+            // if(a!="undefined")
+            //     alert("你刚才输入的是："+a);
+            // else
+            //      alert("你刚才没有输入")
+
+            var complier_flag,run_flag;
+            function compile() {
+                var content=editor.getValue();
+                document.getElementById('symbol_table').style.backgroundColor='#ffc725';
+                document.getElementById('error_log').style.backgroundColor='#ffc725';
+                document.getElementById('P-code').style.backgroundColor='#ffc725';
+                document.getElementById('run_result').style.backgroundColor='#ffc725';
+                editor2.setValue('');
+                if(content=='')
+                    alert('代码不能为空！');
+                else
+                    eel. compile(content,0,run_flag);
+            }
+            function run() {
+                run_flag=true;
+                document.getElementById('symbol_table').style.backgroundColor='#ffc725';
+                document.getElementById('error_log').style.backgroundColor='#ffc725';
+                document.getElementById('P-code').style.backgroundColor='#ffc725';
+                document.getElementById('run_result').style.backgroundColor='#ff6722';
+                var content=editor.getValue();
+                eel.compile(content,5,run_flag)
+            }
+            function showFileName(){
+                code=document.getElementById('code');
+                var f=document.getElementById('input-file').files[0];
+                var reader = new FileReader();
+                reader.readAsText(f, 'UTF-8');
+                reader.onload = function (evt) {
+                    var data = evt.target.result;
+                    editor.setValue(data);
+                }
+            }
+            eel.expose(show_compiler_result);
+            eel.expose(show_P_code);
+            eel.expose(show_error_log);
+            eel.expose(show_symbol);
+            eel.expose(show_run_result);
+            eel.expose(get_input);
+            eel.expose(show_parament_error);
+            function show_symboltable() {
+                document.getElementById('symbol_table').style.backgroundColor='#ff6722';
+                document.getElementById('error_log').style.backgroundColor='#ffc725';
+                document.getElementById('P-code').style.backgroundColor='#ffc725';
+                document.getElementById('run_result').style.backgroundColor='#ffc725';
+                var content=editor.getValue();
+                eel.compile(content,1,run_flag)
+            }
+            function show_error() {
+                document.getElementById('symbol_table').style.backgroundColor='#ffc725';
+                document.getElementById('error_log').style.backgroundColor='#ff6722';
+                document.getElementById('P-code').style.backgroundColor='#ffc725';
+                document.getElementById('run_result').style.backgroundColor='#ffc725';
+                var content=editor.getValue();
+                eel.compile(content,2,run_flag)
+            }
+            function show_code() {
+                document.getElementById('symbol_table').style.backgroundColor='#ffc725';
+                document.getElementById('error_log').style.backgroundColor='#ffc725';
+                document.getElementById('P-code').style.backgroundColor='#ff6722';
+                document.getElementById('run_result').style.backgroundColor='#ffc725';
+                var content=editor.getValue();
+                eel.compile(content,3,run_flag)
+            }
+            function show_result() {
+                if(run_flag==true) {
+                    document.getElementById('symbol_table').style.backgroundColor = '#ffc725';
+                    document.getElementById('error_log').style.backgroundColor = '#ffc725';
+                    document.getElementById('P-code').style.backgroundColor = '#ffc725';
+                    document.getElementById('run_result').style.backgroundColor = '#ff6722';
+                    var content = editor.getValue();
+                    eel.compile(content, 4,run_flag)
+                }
+                else
+                    editor2.setValue('请先运行成功！')
+            }
+            function show_compiler_result(flag){
+                if(flag==true)
+                {
+                  complier_flag=true;
+                  run_flag=false;
+                  document.getElementById('label_result').innerHTML='编译成功';
+                  document.getElementById('label_result').style.color='Green';
+                }
+                else
+                {
+                  complier_flag=false;
+                  run_flag=false;
+                  document.getElementById('label_result').innerHTML='编译失败';
+                  document.getElementById('label_result').style.color='Red';
+                }
+                document.getElementById('symbol_table').style.backgroundColor='#ffc725';
+                document.getElementById('error_log').style.backgroundColor='#ffc725';
+                document.getElementById('P-code').style.backgroundColor='#ffc725';
+                document.getElementById('run_result').style.backgroundColor='#ffc725';
+            }
+            function show_P_code(str) {
+                editor2.setValue(str);
+            }
+            function show_error_log(err_log) {
+                editor2.setValue(err_log);
+            }
+            function show_symbol(str) {
+                editor2.setValue(str);
+            }
+            function show_run_result(str) {
+                editor2.setValue(str);
+                document.getElementById('label_result').innerHTML='运行成功';
+                document.getElementById('label_result').style.color='Green';
+            }
+            function get_input(read_num) {
+                log='请输入所需的{0}参数!(用空格号隔开)'.format(read_num);
+                var input_str=window.prompt('请输入所需的{0}参数!(用空格号隔开)'.format(read_num));
+                return input_str;
+            }
+            String.prototype.format = function() {
+                var resultStr = this.toString();
+                // 参数为对象
+                if(typeof arguments[0] === "object") {
+                    for(var i in arguments[0]) {
+                        resultStr = resultStr.replace("{" + i + "}", arguments[0][i]);
+                    }
+                }
+                // 多个参数
+                else {
+                    for(var i = 0; i < arguments.length; i ++) {
+                        resultStr = resultStr.replace("{" + i + "}", arguments[i]);
+                    }
+                }
+                return resultStr;
+            };
+            function show_parament_error () {
+                alert('请按照要求输入！');
+            }
+        </script>
+
+        <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                    lineNumbers: true,     // 显示行数
+                    indentUnit: 4,         // 缩进单位为4
+                    styleActiveLine: true, // 当前行背景高亮
+                    matchBrackets: true,   // 括号匹配
+                    mode: 'htmlmixed',     // HMTL混合模式
+                    lineWrapping: true,    // 自动换行
+                    theme: 'default',      // 使用monokai模版
+                });
+                editor.setOption("extraKeys", {
+                    // Tab键换成4个空格
+                    Tab: function(cm) {
+                        var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+                        cm.replaceSelection(spaces);
+                    },
+                    // F11键切换全屏
+                    "F11": function(cm) {
+                        cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                    },
+                    // Esc键退出全屏
+                    "Esc": function(cm) {
+                        if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                    }
+                });
+                editor.on("change",function(){
+                    complier_flag=false;
+                    run_flag=false;
+                    document.getElementById('label_result').innerHTML='未编译';
+                    document.getElementById('label_result').style.color='Black';
+                    editor2.setValue('');
+                })
+        </script>
+        <script>
+                var editor2 = CodeMirror.fromTextArea(document.getElementById("result"), {
+                    lineNumbers: false,     // 显示行数
+                    indentUnit: 4,         // 缩进单位为4
+                    styleActiveLine: true, // 当前行背景高亮
+                    matchBrackets: true,   // 括号匹配
+                    mode: 'htmlmixed',     // HMTL混合模式
+                    lineWrapping: true,    // 自动换行
+                    theme: 'default',      // 使用monokai模版
+                });
+                editor2.setOption("extraKeys", {
+                    // Tab键换成4个空格
+                    Tab: function(cm) {
+                        var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+                        cm.replaceSelection(spaces);
+                    },
+                    // F11键切换全屏
+                    "F11": function(cm) {
+                        cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                    },
+                    // Esc键退出全屏
+                    "Esc": function(cm) {
+                        if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                    }
+                });
+         </script>
+</body>
+</html>

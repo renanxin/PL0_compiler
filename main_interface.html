@@ -1,0 +1,144 @@
+<link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css">
+<link href="codemirror/theme/mdn-like.css" rel="stylesheet" type="text/css">
+<link href="codemirror/addon/display/fullscreen.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="codemirror/lib/codemirror.js"></script>
+
+<script type="text/javascript" src="codemirror/mode/javascript/javascript.js"></script>
+<script type="text/javascript" src="codemirror/addon/display/placeholder.js"></script>
+<script type="text/javascript" src="codemirror/mode/xml/xml.js"></script>
+<script type="text/javascript" src="codemirror/mode/css/css.js"></script>
+<script type="text/javascript" src="codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<script type="text/javascript" src="codemirror/addon/selection/active-line.js"></script>
+<script type="text/javascript" src="codemirror/addon/edit/matchbrackets.js"></script>
+<script type="text/javascript" src="codemirror/addon/display/fullscreen.js"></script>
+
+<script type="text/javascript" src="/eel.js"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PL0编译器</title>
+</head>
+<body background="timg.jpeg">
+
+
+        <div id="container" >
+            <section  id="main_content" style="margin: 0 auto;">
+                <div class="" id="head">
+                    <h1 style="text-align:center;font-weight:bold;font-style:italic;color: rgba(255,255,255,0.49);font-size: 40px;">PL0 Lexical Analyzer</h1>
+                </div>
+                <div style="height: 10%;"></div>
+                <div  style="width: 950px; position:relative; margin: 0 auto;">
+                    <div style="width: 400px; float: left" align="left" >
+                        <textarea id="code" placeholder="Input code there." name="code" style="resize:none" rows="10" cols="50"></textarea>
+                        <div style="height: 20px"></div>
+                        <div id="layout_file" style="float:left" align="left">
+                            <input id="input-file" type="file" onchange="showFileName()" style="color: rgba(255,255,255,0.49);font-size: 18px;">
+                        </div>
+                        <div style="height: 20px; width: 400px; float: left" align="left"></div>
+                        <div id="layout_confirm" style="width: 400px; float: left" align="left">
+                            <button type="submit" class="btn btn-secondary" onclick="show()"  style="background: #87ff82;">Run</button>
+                        </div>
+                    </div>
+
+                    <div  style="width: 400px; float: right" >
+                        <textarea id="result" placeholder="The result of your code." name="code" style="resize:none" rows="10" cols="50"></textarea>
+                        <div style="height: 20px"></div>
+                        <div>
+                            <label>运行结果：</label>
+                            <label id="label_result" style="font-weight: bold">未运行</label>
+                        </div>
+                    </div>
+			    </div>
+
+            </section>
+        </div>
+
+
+        <script type="text/javascript">
+            function show() {
+                var content=editor.getValue();
+                eel. your_python_function(content);
+            }
+            function showFileName(){
+                code=document.getElementById('code');
+                var f=document.getElementById('input-file').files[0];
+                var reader = new FileReader();
+                reader.readAsText(f, 'UTF-8');
+                reader.onload = function (evt) {
+                    var data = evt.target.result;
+                    editor.setValue(data);
+                }
+            }
+            eel.expose(show_return);
+            function show_return(flag,log) {
+                editor2.setValue(log);
+                if(!flag) {
+                    document.getElementById('label_result').innerHTML='Error';
+                    document.getElementById('label_result').style.color='Red';
+                }
+                else{
+                    document.getElementById('label_result').innerHTML='Right';
+                    document.getElementById('label_result').style.color='Green';
+                }
+                alert()
+            }
+
+        </script>
+
+        <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                    lineNumbers: true,     // 显示行数
+                    indentUnit: 4,         // 缩进单位为4
+                    styleActiveLine: true, // 当前行背景高亮
+                    matchBrackets: true,   // 括号匹配
+                    mode: 'htmlmixed',     // HMTL混合模式
+                    lineWrapping: true,    // 自动换行
+                    theme: 'default',      // 使用monokai模版
+                });
+                editor.setOption("extraKeys", {
+                    // Tab键换成4个空格
+                    Tab: function(cm) {
+                        var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+                        cm.replaceSelection(spaces);
+                    },
+                    // F11键切换全屏
+                    "F11": function(cm) {
+                        cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                    },
+                    // Esc键退出全屏
+                    "Esc": function(cm) {
+                        if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                    }
+                });
+        </script>
+        <script>
+                var editor2 = CodeMirror.fromTextArea(document.getElementById("result"), {
+                    lineNumbers: false,     // 显示行数
+                    indentUnit: 4,         // 缩进单位为4
+                    styleActiveLine: true, // 当前行背景高亮
+                    matchBrackets: true,   // 括号匹配
+                    mode: 'htmlmixed',     // HMTL混合模式
+                    lineWrapping: true,    // 自动换行
+                    theme: 'default',      // 使用monokai模版
+                });
+                editor2.setOption("extraKeys", {
+                    // Tab键换成4个空格
+                    Tab: function(cm) {
+                        var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+                        cm.replaceSelection(spaces);
+                    },
+                    // F11键切换全屏
+                    "F11": function(cm) {
+                        cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                    },
+                    // Esc键退出全屏
+                    "Esc": function(cm) {
+                        if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                    }
+                });
+         </script>
+</body>
+</html>
